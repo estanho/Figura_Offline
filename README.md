@@ -1,6 +1,4 @@
-# Figura Offline
-
-### Access the [OFFLINE_README](OFFLINE_README.md)
+### 👉 [Offline Readme](OFFLINE_README.md)
 
 ---
 
