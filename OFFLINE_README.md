@@ -12,8 +12,6 @@ The changes to the mod itself are minimal. Most of the work is on the setup side
 
 - This Figura fork (client-side)
 - [Sculptor](https://github.com/shiroyashik/sculptor) as the backend
-- NGINX as reverse proxy
-- DuckDNS for remote access
 - A custom authentication service with whitelist running alongside Sculptor on the same VM
 
 ## Credits
