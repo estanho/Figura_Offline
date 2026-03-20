@@ -28,18 +28,9 @@ public class AuthHandler {
             try {
                 String username = user.getName();
                 String serverID = getServerID(username);
-                FiguraMod.debug("Joining \"{}\" on server \"{}\"", username, serverID);
-                minecraft.getMinecraftSessionService().joinServer(user.getProfileId(), user.getAccessToken(), serverID);
+                FiguraMod.debug("Offline mode - Skipping Mojang auth for \"{}\" on server \"{}\"", username, serverID);
+                //minecraft.getMinecraftSessionService().joinServer(user.getProfileId(), user.getAccessToken(), serverID);
                 NetworkStuff.authSuccess(getToken(serverID));
-            // cringe exceptions
-            } catch (AuthenticationUnavailableException e) {
-                NetworkStuff.authFail(Component.translatable("disconnect.loginFailedInfo.serversUnavailable").getString());
-            } catch (InvalidCredentialsException e) {
-                NetworkStuff.authFail(Component.translatable("disconnect.loginFailedInfo.invalidSession").getString());
-            } catch (InsufficientPrivilegesException e) {
-                NetworkStuff.authFail(Component.translatable("disconnect.loginFailedInfo.insufficientPrivileges").getString());
-            } catch (UserBannedException e) {
-                NetworkStuff.authFail(Component.translatable("disconnect.loginFailedInfo.userBanned").getString());
             } catch (Exception e) {
                 NetworkStuff.authFail(e.getMessage());
             }

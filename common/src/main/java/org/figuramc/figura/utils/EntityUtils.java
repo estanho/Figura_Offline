@@ -90,8 +90,11 @@ public class EntityUtils {
     }
 
     public static boolean checkInvalidPlayer(UUID id) {
+        // In offline mode, allow any UUID version since offline servers don't provide v4 UUIDs
+        /*
         if (id.version() != 4)
             return true;
+        */
 
         PlayerInfo playerInfo = getPlayerInfo(id);
         if (playerInfo == null)

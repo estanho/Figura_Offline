@@ -61,6 +61,8 @@ public class NetworkStuff {
 
     private static final int RECONNECT = 6000; //5 min
     private static int authCheck = RECONNECT;
+    private static int authFailures = 0;
+    private static final int MAX_AUTH_FAILURES = 5;
 
     protected static HttpAPI api;
     protected static WebSocket ws;
@@ -160,10 +162,12 @@ public class NetworkStuff {
     }
 
     private static boolean checkUUID(UUID id) {
+        /*
         if (id.version() != 4) {
             FiguraMod.debug("Voiding request for non v4 UUID \"" + id + "\" (v" + id.version() + ")");
             return true;
         }
+        */
         return false;
     }
 
@@ -178,6 +182,12 @@ public class NetworkStuff {
     }
 
     public static void reAuth() {
+        // Don't attempt to re-authenticate if we've already failed too many times
+        if (authFailures >= MAX_AUTH_FAILURES) {
+            if (debug) FiguraMod.debug("Skipping reAuth - max failures reached");
+            return;
+        }
+
         authCheck = RECONNECT;
         AuthHandler.auth(true);
         fetchMOTD();
@@ -185,12 +195,23 @@ public class NetworkStuff {
 
     protected static void authSuccess(String token) {
         FiguraMod.LOGGER.info("Successfully authed with the " + FiguraMod.MOD_NAME + " auth server!");
+        authFailures = 0; // Reset failure counter on success
         disconnectedReason = null;
         connect(token);
     }
 
     protected static void authFail(String reason) {
+        authFailures++;
         FiguraMod.LOGGER.warn("Failed to auth with the " + FiguraMod.MOD_NAME + " auth server! {}", reason == null ? "" : reason);
+        FiguraMod.LOGGER.warn("Auth failures: {}/{}", authFailures, MAX_AUTH_FAILURES);
+
+        // Prevent infinite reconnection loops
+        if (authFailures >= MAX_AUTH_FAILURES) {
+            FiguraMod.LOGGER.error("Max auth failures reached. Stopping reconnection attempts.");
+            disconnect("Max authentication failures reached. Check your auth server.");
+            return;
+        }
+
         disconnect(reason);
     }
 
@@ -356,6 +377,7 @@ public class NetworkStuff {
                     //TODO - profile screen
                     equipAvatar(List.of(Pair.of(avatar.owner, id)));
                     AvatarManager.localUploaded = true;
+                    AvatarManager.loadLocalAvatar(org.figuramc.figura.avatar.local.LocalAvatarLoader.getLastLoadedPath());
                 }
 
                 //feedback
@@ -438,6 +460,7 @@ public class NetworkStuff {
 
     private static void connectWS(String token) {
         if (ws != null) ws.disconnect();
+
         try {
             ws = KeyStoreHelper.websocketWithBackendCertificates(token);
             ws.connect();
@@ -456,7 +479,7 @@ public class NetworkStuff {
     }
 
     public static void sendPing(int id, boolean sync, byte[] data) {
-        if (!AvatarManager.localUploaded || !isConnected())
+        if (!isConnected())
             return;
 
         try {
