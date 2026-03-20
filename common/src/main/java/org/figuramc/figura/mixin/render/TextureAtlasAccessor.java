@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.Map;
 
-@Mixin(TextureAtlas.class)
+// Sodium fix
+@Mixin(value = TextureAtlas.class, priority = 900)
 public interface TextureAtlasAccessor {
     @Intrinsic
     @Accessor("texturesByName")
