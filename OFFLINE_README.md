@@ -23,4 +23,4 @@ All credit for the original mod goes to the [Figura team](https://github.com/Fig
 > This is a personal setup. A proper tutorial with full configuration details will be added in the future.
 
 
-### Return to [README](README.md)
+### 👉 [Return](https://github.com/estanho/Figura_Offline)
